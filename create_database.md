@@ -57,6 +57,30 @@ Assume, everything is good, the next switches back to transaction context to ent
 MemoryContextSwitchTo(oldcontext);
 ```
 
+Leave a question here: why does it need to parse query string in a new context?
+
+Then we go into a loop, process the parse tree list iterately, each item is assigned to the variable created at the beginning `ListCell *parsetree_item`;
+
+```c
+foreach(parsetree_item, parsetree_list)
+```
+
+And at the beginning of the loop, it declares some variables:
+
+```c
+RawStmt *parsetree = lfirst_node(RawStmt, parsetree_item);
+bool snapshot_set = false;
+CommandTag commandTag;
+QueryCompletion qc;
+MemoryContext per_parsetree_context = NULL;
+List *querytree_list, *plantree_list;
+Portal portal;
+DestReceiver *receiver;
+int16 format;
+const char *cmdtagname;
+size_t cmdtaglen;
+```
+
 
 
 The function
